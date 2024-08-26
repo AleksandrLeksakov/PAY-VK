@@ -1,4 +1,4 @@
-package ru.netology
+
 
 const val DAILY_LIMIT = 150_000L
 const val MONTHLY_LIMIT = 600_000L
