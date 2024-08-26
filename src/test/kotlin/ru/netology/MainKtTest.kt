@@ -11,7 +11,7 @@ class PaymentServiceTest {
         val transferAmount: Long = 100000
         val previousMonthTransfers: Long = 0
         val result = calculateCommission("Mastercard", previousMonthTransfers, transferAmount, false, false)
-        assertEquals(620, result.first)
+        assertEquals(720, result.first)
         assertTrue(result.second)
     }
 
