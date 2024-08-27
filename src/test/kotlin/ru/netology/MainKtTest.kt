@@ -1,8 +1,5 @@
-
-
 import org.junit.Test
 import org.junit.Assert.*
-
 
 class PaymentServiceTest {
 
@@ -61,6 +58,78 @@ class PaymentServiceTest {
         } catch (e: IllegalArgumentException) {
             // Expected exception
         }
-    } // ... (Добавьте другие тесты для различных сценариев)
-}
+    }
 
+    @Test
+    fun testMastercardWithinLimits() {
+        val transferAmount: Long = 5000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Mastercard", previousMonthTransfers, transferAmount, false, false)
+        assertEquals(0, result.first)
+        assertTrue(result.second)
+    }
+
+    @Test
+    fun testMastercardMaestroFreeTransfer() {
+        val transferAmount: Long = 50000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Mastercard", previousMonthTransfers, transferAmount, false, false)
+        assertEquals(0, result.first)
+        assertTrue(result.second)
+    }
+
+    @Test
+    fun testMastercardMaestroFreeTransferLimit() {
+        val transferAmount: Long = 75000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Mastercard", previousMonthTransfers, transferAmount, false, false)
+        assertEquals(0, result.first)
+        assertTrue(result.second)
+    }
+
+
+    @Test
+    fun testVisaMirCommission() {
+        val transferAmount: Long = 80000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Visa", previousMonthTransfers, transferAmount, false, false)
+        assertEquals(600, result.first)
+        assertTrue(result.second)
+    }
+
+    @Test
+    fun testDailyLimitExceeded() {
+        val transferAmount: Long = 160000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Visa", previousMonthTransfers, transferAmount, false, false)
+        assertEquals(0, result.first)
+        assertFalse(result.second)
+    }
+
+    @Test
+    fun testMonthlyLimitExceeded() {
+        val transferAmount: Long = 550000
+        val previousMonthTransfers: Long = 50000
+        val result = calculateCommission("Visa", previousMonthTransfers, transferAmount, false, false)
+        assertEquals(0, result.first)
+        assertFalse(result.second)
+    }
+
+    @Test
+    fun testVkPayDailyLimitExceeded() {
+        val transferAmount: Long = 16000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Visa", previousMonthTransfers, transferAmount, false, true)
+        assertEquals(0, result.first)
+        assertFalse(result.second)
+    }
+
+    @Test
+    fun testVkPayMonthlyLimitExceeded() {
+        val transferAmount: Long = 35000
+        val previousMonthTransfers: Long = 5000
+        val result = calculateCommission("Visa", previousMonthTransfers, transferAmount, false, true)
+        assertEquals(0, result.first)
+        assertFalse(result.second)
+    }
+}
