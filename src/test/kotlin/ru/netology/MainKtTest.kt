@@ -87,6 +87,14 @@ class PaymentServiceTest {
         assertTrue(result.second)
     }
 
+    @Test
+    fun testMastercardMaestroCommission() {
+        val transferAmount: Long = 80000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Mastercard", previousMonthTransfers, transferAmount, false, false)
+        assertEquals(480, result.first)
+        assertTrue(result.second)
+    }
 
     @Test
     fun testVisaMirCommission() {
@@ -132,4 +140,77 @@ class PaymentServiceTest {
         assertEquals(0, result.first)
         assertFalse(result.second)
     }
+
+    @Test
+    fun `test should return commission for transfer from VkPay within limits`() {
+        val transferAmount: Long = 10_000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Visa", previousMonthTransfers, transferAmount, false, true)
+        assertEquals(75, result.first)
+        assertTrue(result.second)
+    }
+
+    @Test
+    fun `test should return commission for transfer from VkPay exceed limits`() {
+        val transferAmount: Long = 20_000
+        val previousMonthTransfers: Long = 30_000
+        val result = calculateCommission("Visa", previousMonthTransfers, transferAmount, false, true)
+        assertEquals(0, result.first)
+        assertFalse(result.second)
+    }
+
+    @Test
+    fun `test should return commission for transfer from Mastercard within limits`() {
+        val transferAmount: Long = 10_000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Mastercard", previousMonthTransfers, transferAmount, false, false)
+        assertEquals(80, result.first)
+        assertTrue(result.second)
+    }
+
+    @Test
+    fun `test should return commission for transfer from Mastercard exceed limits`() {
+        val transferAmount: Long = 160_000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Mastercard", previousMonthTransfers, transferAmount, false, false)
+        assertEquals(970, result.first)
+        assertTrue(result.second)
+    }
+
+    @Test
+    fun `test should return commission for transfer from Visa within limits`() {
+        val transferAmount: Long = 10_000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Visa", previousMonthTransfers, transferAmount, false, false)
+        assertEquals(75, result.first)
+        assertTrue(result.second)
+    }
+
+    @Test
+    fun `test should return commission for transfer from Visa exceed limits`() {
+        val transferAmount: Long = 160_000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Visa", previousMonthTransfers, transferAmount, false, false)
+        assertEquals(1200, result.first)
+        assertTrue(result.second)
+    }
+
+    @Test
+    fun `test should return commission for transfer from Mir within limits`() {
+        val transferAmount: Long = 10_000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Мир", previousMonthTransfers, transferAmount, false, false)
+        assertEquals(75, result.first)
+        assertTrue(result.second)
+    }
+
+    @Test
+    fun `test should return commission for transfer from Mir exceed limits`() {
+        val transferAmount: Long = 160_000
+        val previousMonthTransfers: Long = 0
+        val result = calculateCommission("Мир", previousMonthTransfers, transferAmount, false, false)
+        assertEquals(1200, result.first)
+        assertTrue(result.second)
+    }
+
 }
